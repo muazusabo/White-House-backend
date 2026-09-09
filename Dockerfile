@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma
-RUN npm ci
+RUN npm install --no-audit --no-fund
 RUN npx prisma generate
 
 COPY nest-cli.json tsconfig*.json ./
@@ -18,7 +18,7 @@ ENV NODE_ENV=production
 
 COPY package*.json ./
 COPY prisma ./prisma
-RUN npm ci --omit=dev && npx prisma generate
+RUN npm install --omit=dev --no-audit --no-fund && npx prisma generate
 
 COPY --from=build /app/dist ./dist
 RUN mkdir -p /app/uploads/payment-proofs
