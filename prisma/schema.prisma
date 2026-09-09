@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?     @db.Text
+  price       Decimal     @db.Decimal(10, 2)
+  imageUrl    String?
+  available   Boolean     @default(true)
+  stock       Int?
+  category    Category    @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([categoryId])
+  @@map("products")
+}
+
+model Order {
+  id             Int         @id @default(autoincrement())
+  orderNumber    String      @unique
+  customerName   String
+  lodgeNumber    String?
+  phone          String
+  email          String?
+  note           String?     @db.Text
+  paymentProofUrl String?
+  collectionDate DateTime
+  collectionTime String
+  status         OrderStatus @default(PENDING)
+  total          Decimal     @db.Decimal(10, 2)
+  items          OrderItem[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([phone])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  name      String
+  price     Decimal @db.Decimal(10, 2)
+  quantity  Int
+  subtotal  Decimal @db.Decimal(10, 2)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model RestaurantSettings {
+  id                     Int      @id @default(1)
+  restaurantName         String   @default("White House Eatry")
+  logoUrl                String?
+  phone                  String?
+  location               String?
+  openingHours           String?
+  collectionInstructions String?  @db.Text
+  bankName               String?
+  accountName            String?
+  accountNumber          String?
+  paymentInstructions    String?  @db.Text
+  updatedAt              DateTime @updatedAt
+
+  @@map("restaurant_settings")
+}
