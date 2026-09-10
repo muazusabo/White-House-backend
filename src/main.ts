@@ -53,8 +53,20 @@ async function bootstrap() {
   });
   app.use('/uploads', expressStatic(join(process.cwd(), 'uploads')));
 
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS || process.env.CLIENT_ORIGIN || 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim().replace(/\/$/, ''))
+    .filter(Boolean);
+
   app.enableCors({
-    origin: process.env.CLIENT_ORIGIN?.split(',') || 'http://localhost:3000',
+    origin: (requestOrigin, callback) => {
+      if (!requestOrigin || allowedOrigins.includes(requestOrigin.replace(/\/$/, ''))) {
+        callback(null, true);
+        return;
+      }
+      logger.warn(`Rejected CORS origin: ${requestOrigin}`, 'CORS');
+      callback(new Error('Origin is not allowed by CORS'), false);
+    },
     credentials: true,
   });
 
