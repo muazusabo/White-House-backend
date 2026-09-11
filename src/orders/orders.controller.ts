@@ -52,7 +52,8 @@ export class OrdersController {
       }),
       limits: { fileSize: 5 * 1024 * 1024 },
       fileFilter: (_request, file, callback) => {
-        callback(null, file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf');
+        const allowed = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+        callback(null, allowed.includes(file.mimetype));
       },
     }),
   )
@@ -60,7 +61,7 @@ export class OrdersController {
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file?: UploadedPaymentProof,
   ) {
-    if (!file) throw new BadRequestException('Attach an image or PDF payment proof');
+    if (!file) throw new BadRequestException('Attach a JPG, PNG, WEBP, or PDF payment proof');
     return this.validateAndAttachPaymentProof(
       id,
       file,
@@ -87,14 +88,8 @@ export class OrdersController {
     const isJpeg = contents.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]));
     const isPng = contents.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
     const isWebp = contents.subarray(0, 4).toString() === 'RIFF' && contents.subarray(8, 12).toString() === 'WEBP';
-    const isGif = contents.subarray(0, 3).toString() === 'GIF';
-    const isBmp = contents.subarray(0, 2).toString() === 'BM';
-    const isTiff = contents.subarray(0, 4).equals(Buffer.from([0x49, 0x49, 0x2a, 0x00]))
-      || contents.subarray(0, 4).equals(Buffer.from([0x4d, 0x4d, 0x00, 0x2a]));
-    const isAvif = contents.subarray(4, 12).toString() === 'ftypavif'
-      || contents.subarray(4, 12).toString() === 'ftypavis';
     const isPdf = contents.subarray(0, 5).toString() === '%PDF-';
-    return isJpeg || isPng || isWebp || isGif || isBmp || isTiff || isAvif || isPdf;
+    return isJpeg || isPng || isWebp || isPdf;
   }
 
   private async scanForViruses(filePath: string) {
