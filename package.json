@@ -17,13 +17,13 @@
     "smoke:test": "powershell -ExecutionPolicy Bypass -File scripts/smoke-test.ps1"
   },
   "dependencies": {
-    "@nestjs/common": "^12.0.1",
-    "@nestjs/config": "^12.0.0",
-    "@nestjs/core": "^12.0.1",
-    "@nestjs/jwt": "^12.0.1",
-    "@nestjs/mapped-types": "^12.0.0",
-    "@nestjs/passport": "^12.0.0",
-    "@nestjs/platform-express": "^12.0.1",
+    "@nestjs/common": "11.2.3",
+    "@nestjs/config": "4.0.4",
+    "@nestjs/core": "11.2.3",
+    "@nestjs/jwt": "11.0.2",
+    "@nestjs/mapped-types": "2.1.1",
+    "@nestjs/passport": "11.0.5",
+    "@nestjs/platform-express": "11.2.3",
     "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "^5.19.0",
     "@types/bcryptjs": "^2.4.6",
@@ -40,7 +40,7 @@
     "typescript": "^5.5.4"
   },
   "devDependencies": {
-    "@nestjs/cli": "^12.0.0",
+    "@nestjs/cli": "11.0.24",
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.0",
     "@types/passport-jwt": "^4.0.1"

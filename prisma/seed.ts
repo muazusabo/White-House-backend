@@ -4,19 +4,23 @@ import * as bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = process.env.ADMIN_EMAIL || 'owner@campus-restaurant.local';
+  const email = process.env.ADMIN_EMAIL || 'muazusabo6@gmail.com';
   const password = process.env.ADMIN_PASSWORD || 'ChangeMe123!';
   const name = process.env.ADMIN_NAME || 'Restaurant Owner';
 
   const existing = await prisma.user.findUnique({ where: { email } });
+  const hashed = await bcrypt.hash(password, 10);
   if (!existing) {
-    const hashed = await bcrypt.hash(password, 10);
     await prisma.user.create({
       data: { name, email, password: hashed, role: 'ADMIN' },
     });
     console.log(`Admin user created: ${email}`);
   } else {
-    console.log('Admin user already exists, skipping.');
+    await prisma.user.update({
+      where: { email },
+      data: { name, password: hashed, role: 'ADMIN' },
+    });
+    console.log(`Admin user updated: ${email}`);
   }
 
   await prisma.restaurantSettings.upsert({
