@@ -43,16 +43,6 @@ export class OrdersService {
    * total on the server before creating the order.
    */
   async create(dto: CreateOrderDto) {
-    const settings = await this.prisma.restaurantSettings.findUnique({
-      where: { id: 1 },
-      select: { maintenanceMode: true, maintenanceMessage: true },
-    });
-    if (settings?.maintenanceMode) {
-      throw new BadRequestException(
-        settings.maintenanceMessage || 'Ordering is temporarily paused. Please check back soon.',
-      );
-    }
-
     const collectionDate = new Date(dto.collectionDate);
     if (isNaN(collectionDate.getTime())) {
       throw new BadRequestException('Invalid collection date');
@@ -156,7 +146,10 @@ export class OrdersService {
       return created;
     });
 
-    return order;
+    return {
+      ...order,
+      id: Number(order.id),
+    };
   }
 
   async findOne(id: number) {
