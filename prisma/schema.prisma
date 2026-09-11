@@ -111,6 +111,8 @@ model RestaurantSettings {
   accountName            String?
   accountNumber          String?
   paymentInstructions    String?  @db.Text
+  maintenanceMode        Boolean  @default(false)
+  maintenanceMessage     String?  @db.Text
   updatedAt              DateTime @updatedAt
 
   @@map("restaurant_settings")

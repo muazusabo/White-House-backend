@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class UpdateSettingsDto {
   @IsOptional()
@@ -40,4 +40,12 @@ export class UpdateSettingsDto {
   @IsOptional()
   @IsString()
   paymentInstructions?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  maintenanceMode?: boolean;
+
+  @IsOptional()
+  @IsString()
+  maintenanceMessage?: string;
 }
